@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../models/profile.dart';
 
 class EditProfile extends StatefulWidget {
-  final Map<String, dynamic> profile;
-
+  final Profile profile;
   const EditProfile({super.key, required this.profile});
 
   @override
@@ -11,67 +11,65 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
-
-  late TextEditingController namaController;
-  late TextEditingController angkaController;
+  late TextEditingController _nameController;
+  late TextEditingController _bioController;
+  late TextEditingController _descController;
 
   @override
   void initState() {
     super.initState();
 
-    namaController = TextEditingController(
-      text: widget.profile["nama"],
-    );
-
-    angkaController = TextEditingController(
-      text: widget.profile["angka"].toString(),
-    );
+    _nameController = TextEditingController(text: widget.profile.name);
+    _bioController = TextEditingController(text: widget.profile.bio);
+    _descController = TextEditingController(text: widget.profile.desc52);
   }
 
   @override
   void dispose() {
-    namaController.dispose();
-    angkaController.dispose();
+    _nameController.dispose();
+    _bioController.dispose();
+    _descController.dispose();
     super.dispose();
-  }
-
-  void submit() {
-    Navigator.pop(context, {
-      "nama": namaController.text,
-      "angka": int.parse(angkaController.text),
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-      ),
+      appBar: AppBar(title: const Text("Edit Profile")),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
-                controller: namaController,
-                decoration: const InputDecoration(
-                  labelText: "Nama",
-                ),
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: "Nama", border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               TextFormField(
-                controller: angkaController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Counter",
-                ),
+                controller: _bioController,
+                decoration: const InputDecoration(labelText: "Bio", border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _descController,
+                decoration: const InputDecoration(labelText: "Desc", border: OutlineInputBorder()),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: submit,
-                child: const Text("Simpan"),
+                onPressed: () {
+
+                  Profile updatedData = Profile(
+                    id: widget.profile.id,
+                    name: _nameController.text,
+                    bio: _bioController.text,
+                    desc52: _descController.text,
+                  );
+                  Navigator.pop(context, updatedData);
+                },
+
+                child: const Text("Update Data"),
               ),
             ],
           ),

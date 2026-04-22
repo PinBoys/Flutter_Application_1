@@ -1,32 +1,34 @@
 import 'package:flutter/material.dart';
-import 'edit_profile.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_application_1/models/profile.dart';
+import 'package:flutter_application_1/screens/edit_profile.dart'; 
 
 class DetailProfile extends StatefulWidget {
-  final String nama;
-  final int angka;
-
-  const DetailProfile({
-    super.key,
-    required this.nama,
-    required this.angka,
-  });
+  final Profile profile;
+  const DetailProfile({super.key, required this.profile});
 
   @override
   State<DetailProfile> createState() => _DetailProfileState();
 }
 
 class _DetailProfileState extends State<DetailProfile> {
-  late String nama;
-  late int angka;
 
-  bool isChanged = false;
-  String teks = "I Made Govinda Janottama";
+  void _navigateToEdit() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfile(profile: widget.profile),
+      ),
+    );
 
-  @override
-  void initState() {
-    super.initState();
-    nama = widget.nama;
-    angka = widget.angka;
+    if (result != null && result is Profile) {
+      setState(() {
+        widget.profile.name = result.name;
+        widget.profile.bio = result.bio;
+        widget.profile.desc52 = result.desc52;
+      });
+      Fluttertoast.showToast(msg: "Data berhasil diperbarui!");
+    }
   }
 
   @override
@@ -34,7 +36,7 @@ class _DetailProfileState extends State<DetailProfile> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Profile'),
-        backgroundColor: const Color.fromARGB(255, 205, 168, 220),
+        backgroundColor: const Color.fromARGB(255, 216, 220, 168),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -46,6 +48,7 @@ class _DetailProfileState extends State<DetailProfile> {
                 children: [
                   Container(
                     height: 200,
+                    width: double.infinity,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage('assets/images/background1.jpg'),
@@ -53,7 +56,7 @@ class _DetailProfileState extends State<DetailProfile> {
                       ),
                     ),
                   ),
-                  const Positioned(
+                  Positioned(
                     top: 110,
                     child: CircleAvatar(
                       radius: 80,
@@ -65,95 +68,25 @@ class _DetailProfileState extends State<DetailProfile> {
                 ],
               ),
             ),
-
             Text(
-              nama,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              widget.profile.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
-            const Text(
-              '2415354052',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w100,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
             Text(
-              'Counter saat ini: $angka',
-              style: const TextStyle(fontSize: 16),
+              widget.profile.bio,
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
-
-            const SizedBox(height: 16),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
-                'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris '
-                'nisi ut aliquip ex ea commodo consequat.',
-                textAlign: TextAlign.justify,
-              ),
+            Text(
+              widget.profile.desc52,
+              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
             ),
-
-            const SizedBox(height: 32),
-
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  isChanged = !isChanged;
-                  teks = isChanged
-                      ? "Gopin"
-                      : "I Made Govinda Janottama";
-                });
-              },
-              child: Text(teks),
-            ),
-
             const SizedBox(height: 20),
-
-            // 🔥 BUTTON EDIT (TAMBAHAN JOBSHEET)
-            ElevatedButton(
-              onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfile(
-                      profile: {
-                        "nama": nama,
-                        "angka": angka,
-                      },
-                    ),
-                  ),
-                );
-
-                if (result != null) {
-                  setState(() {
-                    nama = result["nama"];
-                    angka = result["angka"];
-                  });
-                }
-              },
-              child: const Text("Edit"),
+            ElevatedButton.icon(
+              onPressed: _navigateToEdit,
+              icon: const Icon(Icons.edit),
+              label: const Text("Edit Profile"),
             ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Go Back"),
-            ),
-
             const SizedBox(height: 50),
           ],
         ),
