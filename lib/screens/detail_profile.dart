@@ -1,42 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/provider/profile_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_application_1/models/profile.dart';
-import 'package:flutter_application_1/screens/edit_profile.dart'; 
+import 'package:flutter_application_1/screens/edit_profile.dart';
+import 'package:provider/provider.dart';
 
-class DetailProfile extends StatefulWidget {
-  final Profile profile;
-  const DetailProfile({super.key, required this.profile});
+class DetailProfile extends StatelessWidget {
+  final int profileId;
 
-  @override
-  State<DetailProfile> createState() => _DetailProfileState();
-}
-
-class _DetailProfileState extends State<DetailProfile> {
-
-  void _navigateToEdit() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditProfile(profile: widget.profile),
-      ),
-    );
-
-    if (result != null && result is Profile) {
-      setState(() {
-        widget.profile.name = result.name;
-        widget.profile.bio = result.bio;
-        widget.profile.desc52 = result.desc52;
-      });
-      Fluttertoast.showToast(msg: "Data berhasil diperbarui!");
-    }
-  }
+  const DetailProfile({super.key, required this.profileId});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ProfileProvider>();
+
+    final profile = provider.profiles.firstWhere((p) => p.id == profileId);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Profile'),
-        backgroundColor: const Color.fromARGB(255, 216, 220, 168),
+        backgroundColor: Color.fromARGB(255, 197, 168, 220),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -48,8 +30,7 @@ class _DetailProfileState extends State<DetailProfile> {
                 children: [
                   Container(
                     height: 200,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage('assets/images/background1.jpg'),
                         fit: BoxFit.cover,
@@ -61,31 +42,68 @@ class _DetailProfileState extends State<DetailProfile> {
                     child: CircleAvatar(
                       radius: 80,
                       backgroundImage: NetworkImage(
-                        'https://easydrawingguides.com/wp-content/uploads/2021/04/Patrick-Star-Step-10.png',
-                      ),
+                        'https://easydrawingguides.com/wp-content/uploads/2021/04/Patrick-Star-Step-10.png'),
                     ),
                   ),
                 ],
               ),
             ),
+            
             Text(
-              widget.profile.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              profile.name,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
-              widget.profile.bio,
-              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              profile.bio,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 8),
             Text(
-              widget.profile.desc52,
-              style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              profile.phone20,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              profile.nim,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.',
+                textAlign: TextAlign.justify,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Fluttertoast.showToast(msg: "Button ini belum berfungsi");
+              },
+              child: Text("Klik Saya"),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: _navigateToEdit,
-              icon: const Icon(Icons.edit),
-              label: const Text("Edit Profile"),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Go Back"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final updatedProfile = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfile(id: profileId),
+                  ),
+                );
+
+                if (updatedProfile != null) {
+                  provider.updateProfile(profileId, updatedProfile);
+                  Fluttertoast.showToast(msg: 'Profile berhasil diperbarui');
+                }
+              },
+              child: const Text("Edit Profile"),
             ),
             const SizedBox(height: 50),
           ],
